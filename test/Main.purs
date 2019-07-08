@@ -1,6 +1,7 @@
 module Test.Main where
 
 import Prelude
+import Test.Unit (Test)
 import Data.Distributive (distribute)
 import Effect (Effect)
 import Data.Maybe (fromJust)
@@ -11,7 +12,7 @@ import Data.Vec as Vec
 import Partial.Unsafe (unsafePartial)
 import Prelude (Unit, discard, pure, ($), (+))
 import Test.Unit (suite, test)
-import Test.Unit.Assert (equal)
+import Test.Unit.Assert (equal, assert)
 import Test.Unit.Main (runTest)
 
 main :: Effect Unit
@@ -96,6 +97,19 @@ main = runTest do
       let v1 = Vec.vec3 1 2 3
       equal (v1 - v1) zero
       equal ((zero - v1) + v1) zero
+    test "commutativeRing" do
+      let v1 = Vec.vec3 1 2 3
+          v2 = Vec.vec3 4 5 6
+      equal (v1 * v2) (v2 * v1)
+    test "euclideanRing" do
+      notEqual (one :: Vec D3 Number) (zero :: Vec D3 Number)
+      notEqual (one * one) (zero :: Vec D3 Number)
     test "dotProduct" do
       equal 0 $ dotProduct (Vec.vec3 1 0 0) (Vec.vec3 0 1 0)
       equal 32 $ dotProduct (Vec.vec3 1 2 3) (Vec.vec3 4 5 6)
+
+notEqual :: forall a. Eq a => Show a => a -> a -> Test
+notEqual x y = assert "not equal" (x /= y)
+
+greaterThan :: forall a. Ord a => Show a => a -> a -> Test
+greaterThan x y = assert "greater than" (x > y)

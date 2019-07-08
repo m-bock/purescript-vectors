@@ -47,6 +47,7 @@ module Data.Vec
   ) where
 
 import Prelude
+
 import Data.Array as Array
 import Data.Distributive (class Distributive, collectDefault)
 import Data.Foldable (foldl, foldr, foldMap, class Foldable, sum)
@@ -300,6 +301,18 @@ instance semiringVec :: (Semiring a, Nat s) => Semiring (Vec s a) where
 
 instance ringVec :: (Ring a, Nat s) => Ring (Vec s a) where
   sub v1 v2 = zipWithE sub v1 v2
+
+instance commutativeRingVec :: Ring (Vec s a) => CommutativeRing (Vec s a)
+
+instance euclideanRingVec :: (Nat s, EuclideanRing a) => EuclideanRing (Vec s a) where
+  degree _ = 1
+  div v1 v2 = zipWithE div v1 v2
+  mod v1 v2 = zipWithE mod v1 v2
+
+instance divisionRingVec :: (Nat s, DivisionRing a) => DivisionRing (Vec s a) where
+  recip x = map recip x
+
+instance fieldVec :: (Nat s, Field a) => Field (Vec s a)
 
 dotProduct :: ∀s a. Nat s => Semiring a => Vec s a -> Vec s a -> a
 dotProduct a b = sum $ zipWithE (*) a b
