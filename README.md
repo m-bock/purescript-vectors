@@ -1,4 +1,4 @@
-# purescript-sized-vectors
+# purescript-vectors
 
 fork from [bodil/purescript-sized-vectors](https://github.com/bodil/purescript-sized-vectors)
 
