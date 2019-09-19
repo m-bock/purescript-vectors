@@ -17,4 +17,8 @@
     ./packages.dhall
 , sources =
     [ "src/**/*.purs", "test/**/*.purs" ]
+, license =
+    "LGPL-3.0+"
+, repository =
+    "git@github.com:thought2/purescript-vectors.git"
 }
