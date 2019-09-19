@@ -1,7 +1,8 @@
 module Data.Vec
   ( Vec
   , empty
-  , cons, (+>)
+  , cons
+  , (+>)
   , snoc
   , uncons
   , singleton
@@ -17,7 +18,8 @@ module Data.Vec
   , lengthT
   , toArray
   , toUnfoldable
-  , index, (!!)
+  , index
+  , (!!)
   , index'
   , concat
   , updateAt
@@ -47,7 +49,6 @@ module Data.Vec
   ) where
 
 import Prelude
-
 import Data.Array as Array
 import Data.Distributive (class Distributive, collectDefault)
 import Data.Foldable (foldl, foldr, foldMap, class Foldable, sum)
@@ -63,7 +64,8 @@ import Data.Unfoldable (class Unfoldable)
 import Partial.Unsafe (unsafePartial)
 
 -- | `Vec s a` is an array with a fixed size `s` defined at the type level.
-newtype Vec s a = Vec (Array a)
+newtype Vec s a
+  = Vec (Array a)
 
 -- | An empty vector.
 empty :: forall a. Vec D0 a
@@ -72,6 +74,7 @@ empty = Vec []
 -- | Prepend a value to the front of a vector, creating a vector of size `Succ s`.
 cons :: forall s s' a. Succ s s' => a -> Vec s a -> Vec s' a
 cons x (Vec xs) = Vec $ Array.cons x xs
+
 infixr 5 cons as +>
 
 -- | Append a value to the end of a vector, creating a vector of size `Succ s`.
@@ -99,10 +102,11 @@ vec3 x y z = x +> y +> z +> empty
 fill :: forall a s. Nat s => (Int -> a) -> Vec s a
 fill f = Vec $ map f range
   where
-    s = toInt (undefined :: s)
-    range = case s of
-      0 -> []
-      otherwise -> (0 `Array.range`  (s - 1))
+  s = toInt (undefined :: s)
+
+  range = case s of
+    0 -> []
+    otherwise -> (0 `Array.range` (s - 1))
 
 -- | Construct a vector of a given length containing the same element repeated.
 replicate :: forall s a. Nat s => s -> a -> Vec s a
@@ -111,17 +115,19 @@ replicate = const replicate'
 replicate' :: forall s a. Nat s => a -> Vec s a
 replicate' a = Vec $ Array.replicate (toInt (undefined :: s)) a
 
-range' ∷ ∀s. Nat s => Int → Vec s Int
+range' ∷ ∀ s. Nat s => Int → Vec s Int
 range' i = fill (_ + i)
 
-range ∷ ∀s. Nat s => Int → s -> Vec s Int
+range ∷ ∀ s. Nat s => Int → s -> Vec s Int
 range i _ = range' i
 
 -- | Convert an array to a vector.
 fromArray :: forall s a. Nat s => Array a -> Maybe (Vec s a)
-fromArray xs = if Array.length xs == toInt (undefined :: s)
-               then Just $ Vec xs
-               else Nothing
+fromArray xs =
+  if Array.length xs == toInt (undefined :: s) then
+    Just $ Vec xs
+  else
+    Nothing
 
 -- | Get the length of a vector as an integer.
 length :: forall s a. Nat s => Vec s a -> Int
@@ -151,6 +157,7 @@ toUnfoldable (Vec v) = Array.toUnfoldable v
 -- |     -- out of bounds so does not type check
 index :: forall i s a. Nat i => Lt i s => Vec s a -> i -> a
 index (Vec xs) i = unsafePartial $ Array.unsafeIndex xs $ toInt i
+
 infixl 8 index as !!
 
 -- | Value-level indexation with runtime bounds check.
@@ -159,7 +166,7 @@ index' (Vec xs) = Array.index xs
 
 -- | Concatenate two vectors together.
 concat :: forall s1 s2 s3 a. Add s1 s2 s3 => Vec s1 a -> Vec s2 a -> Vec s3 a
-concat (Vec xs1) (Vec xs2) = Vec $ Array.concat [xs1, xs2]
+concat (Vec xs1) (Vec xs2) = Vec $ Array.concat [ xs1, xs2 ]
 
 -- | Update a vector with a given value inserted at a given index.
 updateAt :: forall i s a. Nat i => Lt i s => i -> a -> Vec s a -> Vec s a
@@ -220,9 +227,9 @@ take' (Vec xs) = Vec $ Array.take (toInt (undefined :: c)) xs
 -- | Drop the first `c` elements from a vector.
 drop :: forall c s1 s2 a. Nat c => LtEq c s1 => Sub s1 c s2 => c -> Vec s1 a -> Vec s2 a
 drop c (Vec xs) = Vec $ Array.drop (toInt c) xs
+
 -- the typchecker doesn't like this:
 --drop = const drop'
-
 drop' :: forall c s1 s2 a. Nat c => LtEq c s1 => Sub s1 c s2 => Vec s1 a -> Vec s2 a
 drop' (Vec xs) = Vec $ Array.drop (toInt (undefined :: c)) xs
 
@@ -282,10 +289,14 @@ instance traversableVec :: Nat s => Traversable (Vec s) where
 instance distributiveVec :: Nat s => Distributive (Vec s) where
   collect = collectDefault
   distribute vs =
-    let as = map toArray vs
-        len = toInt (undefined :: s)
-        indexes = if len == 0 then [] else Array.range 0 (len - 1)
-    in  Vec $ flap (unsafePartial Array.unsafeIndex <$> as) <$> indexes
+    let
+      as = map toArray vs
+
+      len = toInt (undefined :: s)
+
+      indexes = if len == 0 then [] else Array.range 0 (len - 1)
+    in
+      Vec $ flap (unsafePartial Array.unsafeIndex <$> as) <$> indexes
 
 instance eqVec :: (Nat s, Eq a) => Eq (Vec s a) where
   eq (Vec v1) (Vec v2) = v1 == v2
@@ -312,7 +323,5 @@ instance euclideanRingVec :: (Nat s, EuclideanRing a) => EuclideanRing (Vec s a)
 instance divisionRingVec :: (Nat s, DivisionRing a) => DivisionRing (Vec s a) where
   recip x = map recip x
 
-instance fieldVec :: (Nat s, Field a) => Field (Vec s a)
-
-dotProduct :: ∀s a. Nat s => Semiring a => Vec s a -> Vec s a -> a
+dotProduct :: ∀ s a. Nat s => Semiring a => Vec s a -> Vec s a -> a
 dotProduct a b = sum $ zipWithE (*) a b
