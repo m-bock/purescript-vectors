@@ -1,5 +1,8 @@
 # purescript-sized-vectors
 
+fork from [bodil/purescript-sized-vectors](https://github.com/bodil/purescript-sized-vectors)
+
+
 Idris style sized vectors using [purescript-typelevel](https://github.com/bodil/purescript-typelevel).
 
 * [API docs on Pursuit](http://pursuit.purescript.org/packages/purescript-sized-vectors/)
