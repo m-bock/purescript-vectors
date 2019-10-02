@@ -18,7 +18,7 @@
 , sources =
     [ "src/**/*.purs", "test/**/*.purs" ]
 , license =
-    "GPL-3.0"
+    "LGPL-3.0-or-later"
 , repository =
     "git@github.com:thought2/purescript-vectors.git"
 }
