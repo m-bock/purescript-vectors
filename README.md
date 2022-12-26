@@ -49,7 +49,7 @@ The library only provide data types and functions for vectors of different sizes
 
 In many Programs either only 3D Vectors or only 2D Vectors are used. Thus all of the the vector data types are named equally.
 
-```
+```hs
 import Data.Vector2 (Vec)
 import Data.Vector2 as Vec
 
