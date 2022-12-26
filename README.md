@@ -23,7 +23,7 @@ vc = va + vb
 ## Design decisions
 
 ### Fixed sizes
-Commonly used Vectors are defined in separate fixed sized types. Currently for (2D and 3D vectors)
+Vectors are defined in separate fixed sized types. Currently for 2D and 3D vectors.
 
 If you need an implementation that is polymorphic on the size of the vectors, you can check out the [fast-vect](https://pursuit.purescript.org/packages/purescript-fast-vect) package.
 
@@ -37,7 +37,7 @@ newtype PosInt = PosInt Int
 type V = Vec PosInt
 ```
 
-Even though there can also be something like `Vec String` most operations defined in here are constrainted to types that define numeric instances such as `Ring` or `Semiring`.
+Even though there can also be something like `Vec String` most operations defined in here are constrained to types that define numeric instances such as `Ring` or `Semiring`.
 
 There may be more specific types provided by other libraries. E.g. a `VecNumber` may provide operations which are `Number` specific. Moreover it could be implemented as JavaScript's `Float64Array` for better interoperablity with WebGL or similar. This is for instance how it's handled in Elm's [linear-algebra](https://github.com/elm-explorations/linear-algebra/blob/master/src/Elm/Kernel/MJS.js#L65) library.
 
@@ -47,7 +47,7 @@ The library only provide data types and functions for vectors of different sizes
 
 ### Naming
 
-In many Programs either only 3D Vectors or only 2D Vectors are used. Thus all of the the vector data types are named equally. 
+In many Programs either only 3D Vectors or only 2D Vectors are used. Thus all of the the vector data types are named equally.
 
 ```
 import Data.Vector2 (Vec)
@@ -67,7 +67,7 @@ f :: V2.Vec -> V3.Vec -> Int
 f (V2.Vec x y) ...
 ```
 
-`Vec` was chosen as it's somewhere in the middle of "descriptive" and "short". Other options were `Vector`, `Vect`, `V`. Note that we could only provide a short infix alternative for the 2D vector, so this was't provided at all for consistency reasons.
+`Vec` was chosen as it's somewhere in the middle of "descriptive" and "short". Other options were `Vector`, `Vect`, `V`. Note that we could have provides a short infix alternative only for the 2D vector, so this was't provided at all for consistency reasons.
 
 
 ### Exposed Constructor
