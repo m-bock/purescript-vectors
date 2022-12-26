@@ -1,13 +1,13 @@
 -- | - Types
--- |   - [Vec2](#t:Vec2)
+-- |   - [Vec](#t:Vec)
 -- |
 -- | - Constructors
--- |   - [vec2](#v:vec2)
--- |   - [oneY](#v:oneY)
+-- |   - [vec](#v:vec)
 -- |   - [oneX](#v:oneX)
+-- |   - [oneY](#v:oneY)
 -- |
 -- | - Destructors
--- |   - [unVec2](#v:unVec2)
+-- |   - [unVec](#v:unVec)
 -- |   - [getX](#v:getX)
 -- |   - [getY](#v:getY)
 -- |
@@ -16,26 +16,26 @@
 -- |
 -- | - Component Modifiers
 -- |   - [setX](#v:setX)
--- |   - [modifyX](#v:modifyX)
 -- |   - [setY](#v:setY)
+-- |   - [modifyX](#v:modifyX)
 -- |   - [modifyY](#v:modifyY)
 -- |
 -- | - Lens API
 -- |   - [_x](#v:_x)
 -- |   - [_y](#v:_y)
 
-module Data.Vec2
-  ( Vec2(..)
-  , vec2
+module Data.Vector2
+  ( Vec(..)
+  , vec
   , oneX
   , oneY
-  , unVec2
+  , unVec
   , getX
   , getY
   , swap
   , setX
-  , modifyX
   , setY
+  , modifyX
   , modifyY
   , _x
   , _y
@@ -56,88 +56,88 @@ import Data.Traversable (class Traversable, sequenceDefault)
 
 -- | Polymorphic 2D vector
 
-data Vec2 a
+data Vec a
   -- | Creates a vector from two components
-  = Vec2 a a
+  = Vec a a
 
-derive instance Generic (Vec2 a) _
+derive instance Generic (Vec a) _
 
-derive instance Eq a => Eq (Vec2 a)
+derive instance Eq a => Eq (Vec a)
 
-derive instance Ord a => Ord (Vec2 a)
+derive instance Ord a => Ord (Vec a)
 
-derive instance Functor Vec2
+derive instance Functor Vec
 
-instance Foldable Vec2 where
-  foldr f b (Vec2 x y) = f x (f y b)
-  foldl f b (Vec2 x y) = f (f b x) y
+instance Foldable Vec where
+  foldr f b (Vec x y) = f x (f y b)
+  foldl f b (Vec x y) = f (f b x) y
   foldMap = foldMapDefaultL
 
-instance Traversable Vec2 where
-  traverse f (Vec2 x y) = Vec2 <$> f x <*> f y
+instance Traversable Vec where
+  traverse f (Vec x y) = Vec <$> f x <*> f y
   sequence = sequenceDefault
 
-instance Show a => Show (Vec2 a) where
+instance Show a => Show (Vec a) where
   show = genericShow
 
--- | component wise `Semiring` implementation
+-- | Componentwise `Semiring` implementation
 -- | ```
--- | > Vec2 2 3 * Vec2 4 5
--- | Vec2 8 15
+-- | > Vec 2 3 * Vec 4 5
+-- | Vec 8 15
 -- | ```
 
-instance Semiring a => Semiring (Vec2 a) where
+instance Semiring a => Semiring (Vec a) where
   add = lift2 add
   zero = pure zero
   mul = lift2 mul
   one = pure one
 
-instance Ring a => Ring (Vec2 a) where
+instance Ring a => Ring (Vec a) where
   sub = lift2 sub
 
-instance Applicative Vec2 where
-  pure x = Vec2 x x
+instance Applicative Vec where
+  pure x = Vec x x
 
 -- | Zippy `Apply` implementation
 -- | ```
--- | > (<>) <$> Vec2 "A" "B" <*> Vec2 "1" "2"
--- | Vec2 "A1" "B2"
+-- | > (<>) <$> Vec "A" "B" <*> Vec "1" "2"
+-- | Vec "A1" "B2"
 -- | ```
 
-instance Apply Vec2 where
-  apply (Vec2 f g) (Vec2 x y) = Vec2 (f x) (g y)
+instance Apply Vec where
+  apply (Vec f g) (Vec x y) = Vec (f x) (g y)
 
 --------------------------------------------------------------------------------
 --- Constructors
 --------------------------------------------------------------------------------
 
 -- | Creates a vector from two components
-vec2 :: forall a. a -> a -> Vec2 a
-vec2 = Vec2
-
--- | Vector with X value `zero` and Y value `one`.
--- |
--- | In analogy to the existing `Semiring` methods `one` and `zero` for `Vec2`.
--- |
--- | ```
--- | > oneX + oneY == one
--- | true
--- | ```
-
-oneY :: forall a. Semiring a => Vec2 a
-oneY = Vec2 zero one
+vec :: forall a. a -> a -> Vec a
+vec = Vec
 
 -- | Vector with X value `one` and Y value `zero`.
 -- |
--- | In analogy to the existing `Semiring` methods `one` and `zero` for `Vec2`
+-- | In analogy to the existing `Semiring` methods `one` and `zero` for `Vec`
 -- |
 -- | ```
 -- | > oneX + oneY == one
 -- | true
 -- | ```
 
-oneX :: forall a. Semiring a => Vec2 a
-oneX = Vec2 one zero
+oneX :: forall a. Semiring a => Vec a
+oneX = Vec one zero
+
+-- | Vector with X value `zero` and Y value `one`.
+-- |
+-- | In analogy to the existing `Semiring` methods `one` and `zero` for `Vec`.
+-- |
+-- | ```
+-- | > oneX + oneY == one
+-- | true
+-- | ```
+
+oneY :: forall a. Semiring a => Vec a
+oneY = Vec zero one
 
 --------------------------------------------------------------------------------
 --- Destructors
@@ -146,12 +146,12 @@ oneX = Vec2 one zero
 -- | Pattern match on a vector by providing a reducer function
 -- |
 -- | ```
--- | > unVec2 (+) (Vec 1 2)
+-- | > unVec (+) (Vec 1 2)
 -- | 3
 -- | ```
 
-unVec2 :: forall a z. (a -> a -> z) -> Vec2 a -> z
-unVec2 f (Vec2 x y) = f x y
+unVec :: forall a z. (a -> a -> z) -> Vec a -> z
+unVec f (Vec x y) = f x y
 
 -- | Retrieves the X component of a vector
 -- |
@@ -160,8 +160,8 @@ unVec2 f (Vec2 x y) = f x y
 -- | 1
 -- | ```
 
-getX :: forall a. Vec2 a -> a
-getX (Vec2 x _) = x
+getX :: forall a. Vec a -> a
+getX (Vec x _) = x
 
 -- | Retrieves the Y component of a vector
 -- |
@@ -170,8 +170,8 @@ getX (Vec2 x _) = x
 -- | 2
 -- | ```
 
-getY :: forall a. Vec2 a -> a
-getY (Vec2 _ y) = y
+getY :: forall a. Vec a -> a
+getY (Vec _ y) = y
 
 --------------------------------------------------------------------------------
 --- Vector Modifiers
@@ -180,12 +180,12 @@ getY (Vec2 _ y) = y
 -- | Exchanges the X and Y component of a vector
 -- |
 -- | ```
--- | > swap (Vec2 1 2)
--- | Vec2 2 1
+-- | > swap (Vec 1 2)
+-- | Vec 2 1
 -- | ```
 
-swap :: forall a. Vec2 a -> Vec2 a
-swap (Vec2 x y) = Vec2 y x
+swap :: forall a. Vec a -> Vec a
+swap (Vec x y) = Vec y x
 
 --------------------------------------------------------------------------------
 --- Component Modifiers
@@ -194,29 +194,54 @@ swap (Vec2 x y) = Vec2 y x
 -- | Sets the X component of a vector
 -- |
 -- | ```
--- | > setX "C" (Vec2 "A" "B")
--- | Vec2 "C" "B"
+-- | > setX "C" (Vec "A" "B")
+-- | Vec "C" "B"
 -- | ```
 
-setX :: forall a. a -> Vec2 a -> Vec2 a
-setX x (Vec2 _ y) = Vec2 x y
+setX :: forall a. a -> Vec a -> Vec a
+setX x (Vec _ y) = Vec x y
 
-modifyX :: forall a. (a -> a) -> Vec2 a -> Vec2 a
-modifyX f (Vec2 x y) = Vec2 (f x) y
+-- | Sets the Y component of a vector
+-- |
+-- | ```
+-- | > setY "C" (Vec "A" "B")
+-- | Vec "A" "C"
+-- | ```
 
-setY :: forall a. a -> Vec2 a -> Vec2 a
-setY y (Vec2 x _) = Vec2 x y
+setY :: forall a. a -> Vec a -> Vec a
+setY y (Vec x _) = Vec x y
 
-modifyY :: forall a. (a -> a) -> Vec2 a -> Vec2 a
-modifyY f (Vec2 x y) = Vec2 x (f y)
+-- | Modifies the X component of a vector
+-- |
+-- | ```
+-- | > modifyX (add 10) (Vec 3 4)
+-- | Vec 13 4
+-- | ```
+
+modifyX :: forall a. (a -> a) -> Vec a -> Vec a
+modifyX f (Vec x y) = Vec (f x) y
+
+-- | Modifies the Y component of a vector
+-- |
+-- | ```
+-- | > modifyY (add 10) (Vec 3 4)
+-- | Vec 3 14
+-- | ```
+
+modifyY :: forall a. (a -> a) -> Vec a -> Vec a
+modifyY f (Vec x y) = Vec x (f y)
 
 --------------------------------------------------------------------------------
 --- Lens API
 --------------------------------------------------------------------------------
 
-_x :: forall a. Lens' (Vec2 a) a
+-- | A Lens on the X component of a vector
+
+_x :: forall a. Lens' (Vec a) a
 _x = lens getX (flip setX)
 
-_y :: forall a. Lens' (Vec2 a) a
+-- | A Lens on the Y component of a vector
+
+_y :: forall a. Lens' (Vec a) a
 _y = lens getY (flip setY)
 
