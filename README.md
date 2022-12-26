@@ -74,3 +74,10 @@ f (V2.Vec x y) ...
 
 Implementation is exposed. This allows easy and clean destructuring of vector components. However it does not allow to change the implementation behind the scenes to something that is maybe more performant. Clarity and convenience was a higher priority than optimization. However with a contemporary [code optimizer](https://github.com/aristanetworks/purescript-backend-optimizer) this tradeoff is probably vastly reduced.
 
+## Inspired By
+
+- Haskell's [linear](https://hackage.haskell.org/package/linear) package
+- Elm's [linear-algebra](https://package.elm-lang.org/packages/elm-explorations/linear-algebra/latest/) package
+- Elm's [geometry](https://package.elm-lang.org/packages/ianmackenzie/elm-geometry/latest/) package
+- PureScript's [sized-vectors](https://pursuit.purescript.org/packages/purescript-sized-vectors)
+- PureScript's [fast-vect](https://pursuit.purescript.org/packages/purescript-fast-vect)
