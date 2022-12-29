@@ -2,6 +2,10 @@
 
 Fixed size polymorphic vectors
 
+## Documentation
+
+- Module documentation is [published on Pursuit](http://pursuit.purescript.org/packages/purescript-vectors).
+
 ## Example
 
 In a nutshell:
