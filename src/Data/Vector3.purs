@@ -2,9 +2,9 @@
 -- |   - [Vec](#t:Vec)
 -- |
 -- | - Constructors
--- |   - [vec2](#v:vec2)
--- |   - [oneY](#v:oneY)
+-- |   - [vec](#v:vec)
 -- |   - [oneX](#v:oneX)
+-- |   - [oneY](#v:oneY)
 -- |   - [oneZ](#v:oneZ)
 -- |
 -- | - Destructors
@@ -16,6 +16,12 @@
 -- | - Vector Modifiers
 -- |   - [rotRight](#v:rotRight)
 -- |   - [rotLeft](#v:rotLeft)
+-- |
+-- | - Componentwise Operations
+-- |   - [vdiv](#v:vdiv)
+-- |   - [vmod](#v:vmod)
+-- |   - [half](#v:half)
+-- |   - [twice](#v:twice)
 -- |
 -- | - Component Modifiers
 -- |   - [setX](#v:setX)
@@ -31,23 +37,41 @@
 -- |   - [_z](#v:_z)
 
 module Data.Vector3
+  --- Types
   ( Vec(..)
+
+  --- Constructors
   , vec
   , oneX
   , oneY
   , oneZ
+
+  --- Destructors
   , unVec
   , getX
   , getY
   , getZ
+
+  --- Vector Modifiers
   , rotRight
   , rotLeft
+
+  --- Componentwise Operations
+  , vdiv
+  , (//)
+  , vmod
+  , half
+  , twice
+
+  --- Component Modifiers
   , setX
   , setY
   , setZ
   , modifyX
   , modifyY
   , modifyZ
+
+  --- Lens API
   , _x
   , _y
   , _z
@@ -81,8 +105,8 @@ derive instance Ord a => Ord (Vec a)
 derive instance Functor Vec
 
 instance Foldable Vec where
-  foldr f b (Vec x y z) = f x (f y b)
-  foldl f b (Vec x y z) = f (f b x) y
+  foldr f b (Vec x y z) = f x (f y (f z b))
+  foldl f b (Vec x y z) = f (f (f b x) y) z
   foldMap = foldMapDefaultL
 
 instance Traversable Vec where
@@ -232,6 +256,54 @@ rotLeft :: forall a. Vec a -> Vec a
 rotLeft (Vec x y z) = Vec y z x
 
 --------------------------------------------------------------------------------
+--- Componentwise Operations
+--------------------------------------------------------------------------------
+
+-- | Divides two vectors componentwise.
+-- | This exists because there cannot be an `EuclideanRing` instance for `Vec`
+-- |
+-- | ```
+-- | > vdiv (Vec 9 6 4) (Vec 3 2 4)
+-- | Vec 3 3 1
+-- | ```
+
+vdiv :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
+vdiv (Vec x1 y1 z1) (Vec x2 y2 z2) = Vec (div x1 x2) (div y1 y2) (div z1 z2)
+
+infixl 7 vdiv as //
+
+-- | Componentwise Modulo operation
+-- | This exists because there cannot be an `EuclideanRing` instance for `Vec`
+-- | 
+-- | ```
+-- | > mod (Vec 12 120 1200) (Vec 120 100 1000)
+-- | Vec 2 20 200
+-- | ```
+
+vmod :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
+vmod (Vec x1 y1 z1) (Vec x2 y2 z2) = Vec (mod x1 x2) (mod y1 y2) (mod z1 z2)
+
+-- | Halves the amount of each component
+-- |
+-- | ```
+-- | > half (Vec 10 100 1000)
+-- | Vec 5 50 500
+-- | ```
+
+half :: forall a. EuclideanRing a => Vec a -> Vec a
+half (Vec x y z) = Vec (x / two) (y / two) (z / two)
+
+-- | Duplicates the amount of each component
+-- |
+-- | ```
+-- | > twice (Vec 10 100 1000)
+-- | Vec 20 200 2000
+-- | ```
+
+twice :: forall a. EuclideanRing a => Vec a -> Vec a
+twice (Vec x y z) = Vec (x * two) (y * two) (z * two)
+
+--------------------------------------------------------------------------------
 --- Component Modifiers
 --------------------------------------------------------------------------------
 
@@ -314,3 +386,9 @@ _y = lens getY (flip setY)
 _z :: forall a. Lens' (Vec a) a
 _z = lens getZ (flip setZ)
 
+--------------------------------------------------------------------------------
+--- Internal Util
+--------------------------------------------------------------------------------
+
+two :: forall a. Semiring a => a
+two = one + one
