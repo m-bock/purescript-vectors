@@ -14,6 +14,12 @@
 -- | - Vector Modifiers
 -- |   - [swap](#v:swap)
 -- |
+-- | - Componentwise Operations
+-- |   - [vdiv](#v:vdiv)
+-- |   - [vmod](#v:vmod)
+-- |   - [half](#v:half)
+-- |   - [twice](#v:twice)
+-- |
 -- | - Component Modifiers
 -- |   - [setX](#v:setX)
 -- |   - [setY](#v:setY)
@@ -25,18 +31,36 @@
 -- |   - [_y](#v:_y)
 
 module Data.Vector2
+  --- Types
   ( Vec(..)
+
+  --- Constructors
   , vec
   , oneX
   , oneY
+
+  --- Destructors
   , unVec
   , getX
   , getY
+
+  --- Vector Modifiers
   , swap
+
+  --- Componentwise Operations
+  , vdiv
+  , (//)
+  , vmod
+  , half
+  , twice
+
+  --- Component Modifiers
   , setX
   , setY
   , modifyX
   , modifyY
+
+  --- Lens API
   , _x
   , _y
   ) where
@@ -188,6 +212,54 @@ swap :: forall a. Vec a -> Vec a
 swap (Vec x y) = Vec y x
 
 --------------------------------------------------------------------------------
+--- Componentwise Operations
+--------------------------------------------------------------------------------
+
+-- | Divides two vectors componentwise.
+-- | This exists because there cannot be an `EuclideanRing` instance for `Vec`
+-- |
+-- | ```
+-- | > vdiv (Vec 9 6) (Vec 3 2)
+-- | Vec 3 3
+-- | ```
+
+vdiv :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
+vdiv (Vec x1 y1) (Vec x2 y2) = Vec (div x1 x2) (div y1 y2)
+
+infixl 7 vdiv as //
+
+-- | Componentwise Modulo operation
+-- | This exists because there cannot be an `EuclideanRing` instance for `Vec`
+-- | 
+-- | ```
+-- | > mod (Vec 12 120) (Vec 120 100)
+-- | Vec 2 20
+-- | ```
+
+vmod :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
+vmod (Vec x1 y1) (Vec x2 y2) = Vec (mod x1 x2) (mod y1 y2)
+
+-- | Halves the amount of each component
+-- |
+-- | ```
+-- | > half (Vec 10 100)
+-- | Vec 5 50
+-- | ```
+
+half :: forall a. EuclideanRing a => Vec a -> Vec a
+half (Vec x y) = Vec (x / two) (y / two)
+
+-- | Duplicates the amount of each component
+-- |
+-- | ```
+-- | > twice (Vec 10 100)
+-- | Vec 20 200
+-- | ```
+
+twice :: forall a. EuclideanRing a => Vec a -> Vec a
+twice (Vec x y) = Vec (x * two) (y * two)
+
+--------------------------------------------------------------------------------
 --- Component Modifiers
 --------------------------------------------------------------------------------
 
@@ -245,3 +317,9 @@ _x = lens getX (flip setX)
 _y :: forall a. Lens' (Vec a) a
 _y = lens getY (flip setY)
 
+--------------------------------------------------------------------------------
+--- Internal Util
+--------------------------------------------------------------------------------
+
+two :: forall a. Semiring a => a
+two = one + one
