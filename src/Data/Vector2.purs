@@ -15,8 +15,8 @@
 -- |   - [swap](#v:swap)
 -- |
 -- | - Componentwise Operations
--- |   - [vdiv](#v:vdiv)
--- |   - [vmod](#v:vmod)
+-- |   - [div](#v:div)
+-- |   - [mod](#v:mod)
 -- |   - [half](#v:half)
 -- |   - [twice](#v:twice)
 -- |
@@ -48,9 +48,9 @@ module Data.Vector2
   , swap
 
   --- Componentwise Operations
-  , vdiv
+  , div
   , (//)
-  , vmod
+  , mod
   , half
   , twice
 
@@ -65,7 +65,8 @@ module Data.Vector2
   , _y
   ) where
 
-import Prelude
+import Prelude hiding (mod, div)
+import Prelude as P
 
 import Control.Apply (lift2)
 import Data.Foldable (class Foldable, foldMapDefaultL)
@@ -219,14 +220,14 @@ swap (Vec x y) = Vec y x
 -- | This exists because there cannot be an `EuclideanRing` instance for `Vec`
 -- |
 -- | ```
--- | > vdiv (Vec 9 6) (Vec 3 2)
+-- | > div (Vec 9 6) (Vec 3 2)
 -- | Vec 3 3
 -- | ```
 
-vdiv :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
-vdiv (Vec x1 y1) (Vec x2 y2) = Vec (div x1 x2) (div y1 y2)
+div :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
+div (Vec x1 y1) (Vec x2 y2) = Vec (P.div x1 x2) (P.div y1 y2)
 
-infixl 7 vdiv as //
+infixl 7 div as //
 
 -- | Componentwise Modulo operation
 -- | This exists because there cannot be an `EuclideanRing` instance for `Vec`
@@ -236,8 +237,8 @@ infixl 7 vdiv as //
 -- | Vec 2 20
 -- | ```
 
-vmod :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
-vmod (Vec x1 y1) (Vec x2 y2) = Vec (mod x1 x2) (mod y1 y2)
+mod :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
+mod (Vec x1 y1) (Vec x2 y2) = Vec (P.mod x1 x2) (P.mod y1 y2)
 
 -- | Halves the amount of each component
 -- |

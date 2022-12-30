@@ -18,8 +18,8 @@
 -- |   - [rotLeft](#v:rotLeft)
 -- |
 -- | - Componentwise Operations
--- |   - [vdiv](#v:vdiv)
--- |   - [vmod](#v:vmod)
+-- |   - [div](#v:div)
+-- |   - [mod](#v:mod)
 -- |   - [half](#v:half)
 -- |   - [twice](#v:twice)
 -- |
@@ -57,9 +57,9 @@ module Data.Vector3
   , rotLeft
 
   --- Componentwise Operations
-  , vdiv
+  , div
   , (//)
-  , vmod
+  , mod
   , half
   , twice
 
@@ -77,7 +77,8 @@ module Data.Vector3
   , _z
   ) where
 
-import Prelude
+import Prelude hiding (mod, div)
+import Prelude as P
 
 import Control.Apply (lift2)
 import Data.Foldable (class Foldable, foldMapDefaultL)
@@ -263,14 +264,14 @@ rotLeft (Vec x y z) = Vec y z x
 -- | This exists because there cannot be an `EuclideanRing` instance for `Vec`
 -- |
 -- | ```
--- | > vdiv (Vec 9 6 4) (Vec 3 2 4)
+-- | > div (Vec 9 6 4) (Vec 3 2 4)
 -- | Vec 3 3 1
 -- | ```
 
-vdiv :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
-vdiv (Vec x1 y1 z1) (Vec x2 y2 z2) = Vec (div x1 x2) (div y1 y2) (div z1 z2)
+div :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
+div (Vec x1 y1 z1) (Vec x2 y2 z2) = Vec (P.div x1 x2) (P.div y1 y2) (P.div z1 z2)
 
-infixl 7 vdiv as //
+infixl 7 div as //
 
 -- | Componentwise Modulo operation
 -- | This exists because there cannot be an `EuclideanRing` instance for `Vec`
@@ -280,8 +281,8 @@ infixl 7 vdiv as //
 -- | Vec 2 20 200
 -- | ```
 
-vmod :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
-vmod (Vec x1 y1 z1) (Vec x2 y2 z2) = Vec (mod x1 x2) (mod y1 y2) (mod z1 z2)
+mod :: forall a. EuclideanRing a => Vec a -> Vec a -> Vec a
+mod (Vec x1 y1 z1) (Vec x2 y2 z2) = Vec (P.mod x1 x2) (P.mod y1 y2) (P.mod z1 z2)
 
 -- | Halves the amount of each component
 -- |
